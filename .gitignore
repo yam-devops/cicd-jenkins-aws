@@ -1,0 +1,13 @@
+*
+!**/
+!.gitignore
+!.md
+!*.myfuncs
+!*.sh
+!*.c
+!*.py
+!makefile
+!*.html
+!requirements.txt
+
+
