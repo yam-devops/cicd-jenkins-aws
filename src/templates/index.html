@@ -1,0 +1,36 @@
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title> Weather Forecast </title>
+	</head>
+	<style>
+	body {
+	}
+	</style>
+
+	<body>
+
+	<center>
+		<font face="Fantasy">
+		<h1  face style="color: #33ffac"> Welcome To The Weather Forecast </h1>
+		</font>
+	<div>
+		<form action="/yourforecast" method="POST">
+			<label for="city">City Name:</label>
+			<input type="text" name="city" placeholder="City" required>
+			<label for="days">Days To Lookup:</label>
+			<select name="days" required>
+		{% for i in range(1,11) %}
+			<option value={{i}}>{{i}}</option>
+		{% endfor %}
+			</select>
+			<button type="submit">Get Forecast</button>
+	</center>
+
+		</form>
+	
+	</div>
+	</body>
+</html>
+

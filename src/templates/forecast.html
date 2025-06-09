@@ -1,0 +1,36 @@
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title> weather forecast </title>
+	</head>
+
+	<body>
+		<center>
+		<h1> Weather In {{ data["city"][0] }}, {{ data["country"][0] }} </h1>
+		</center>
+	<div>
+	<table style="width:100%", border="5">
+		<tr>
+
+			<td>Date</td>
+			<td>Minimum Tempareture</td>
+			<td>Maximum Tempareture</td>
+			<td>Average Tempareture</td>
+			<td>Humidity</td>
+		
+		</tr>
+
+		 {% for i in range(DAYS) %}
+                    <tr>
+                        <td>{{ data["date"][i] }}</td>
+                        <td>{{ data["min_temp"][i] }}°C</td>
+                        <td>{{ data["max_temp"][i] }}°C</td>
+                        <td>{{ data["avg_temp"][i] }}°C</td>
+                        <td>{{ data["humidity"][i] }}%</td>
+                    </tr>
+                {% endfor %}
+	</table>
+	</div>
+	</body>
+
