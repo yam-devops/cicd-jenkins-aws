@@ -28,10 +28,11 @@ def dispaly_forecast():
 	days = int(request.form['days'])
 
 	user_request = ApiRequest(city=city, days=days) 
+
 	forecast = Weather(user_request)
 
 	if forecast.error != None:
-		
+
 		return render_template("error.html", error = forecast.error), forecast.status_code	
 
 	city_requests_counter.labels(city=city).inc()

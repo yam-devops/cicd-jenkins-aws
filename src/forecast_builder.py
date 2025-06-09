@@ -8,7 +8,7 @@ class Weather:
 		self.response, self.status_code = self.call_api()
 		self.error = None
 		
-		if self.status_code == 403:
+		if self.status_code == 401:
 			raise InvalidApiKey
 
 		if "error" in self.response:

@@ -24,7 +24,7 @@ class OpenApi():
 
 		url = f"http://api.weatherapi.com/v1/forecast.json?key={API_KEY}&q={self.Api_request.city}&days={self.Api_request.days}&aqi=no&alerts=no"
 		response = requests.get(url)
-			
+
 		return response.json(), response.status_code
 
 
