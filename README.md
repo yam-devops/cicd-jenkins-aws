@@ -7,5 +7,5 @@ Hi! if you are seeing this, I'm currently working on organizing and applying my 
 I'm in the process of maintaining and uploading the necessary files.
 Everything will be uploaded in the coming days. For now you can see my progress.
 
-Thanks for your interest in my project
+Thanks for your interest in my project!
 
