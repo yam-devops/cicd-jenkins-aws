@@ -9,5 +9,10 @@
 !makefile
 !*.html
 !requirements.txt
+!Dockerfile
+
+
+
+
 
 .venv
