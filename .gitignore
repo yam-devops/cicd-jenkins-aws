@@ -10,7 +10,7 @@
 !*.html
 !requirements.txt
 !Dockerfile
-
+!Jenkinsfile
 
 
 
