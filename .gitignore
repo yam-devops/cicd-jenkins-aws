@@ -12,7 +12,7 @@
 !Dockerfile
 !Jenkinsfile
 !*.tf
-
+!*.yaml
 
 
 .terraform/
