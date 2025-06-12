@@ -1,0 +1,15 @@
+
+namespace: prod
+
+ingress:
+  className: "alb"
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+  hosts:
+    - host: weather-prod.your-domain.com
+      serviceName: weather-app
+      servicePort: 80
+      path: /
+      pathType: Prefix
+

@@ -1,0 +1,15 @@
+
+namespace: staging
+
+ingress:
+  className: "alb"
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+  hosts:
+    - host: weather-staging.your-domain.com
+      serviceName: weather-app-svc
+      servicePort: 80
+      path: /
+      pathType: Prefix
+

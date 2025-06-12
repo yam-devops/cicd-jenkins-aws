@@ -1,0 +1,7 @@
+apiVersion: v2
+name: weather-ingress
+description: A Helm chart for Ingress for weather app
+type: application
+version: 0.1.0
+appVersion: "1.0"
+
