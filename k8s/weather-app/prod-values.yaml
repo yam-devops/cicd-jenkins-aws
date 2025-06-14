@@ -1,0 +1,21 @@
+replicaCount: 1
+
+
+namespace: prod
+
+weatherApp:
+  image:
+    repository: ${DOCKER_USER}/weather_app
+    tag: v17
+    pullPolicy: IfNotPresent
+    pullSecret: my-registry-secret
+  port: 5000
+
+
+
+
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 5000
