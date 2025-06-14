@@ -1,4 +1,4 @@
-# GitOps CI/CD Project with Argo CD, Terraform, Jenkins, and GitLab
+# GitOps CI/CD Project on AWS with Argo CD, Terraform, Jenkins, and GitLab
 
 ## Overview
 
