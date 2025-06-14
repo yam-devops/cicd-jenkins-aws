@@ -17,17 +17,20 @@ module "vpc" {
 
   public_subnet_tags = {
     "kubernetes.io/role/elb"                    = "1"
-    "kubernetes.io/cluster/eks_deploy" = "shared"
+    "kubernetes.io/cluster/eks_prod" = "shared"
+    "kubernetes.io/cluster/eks_staging" = "shared"
     "kubernetes.io/cluster/eks_dev" = "shared"
   }
 
   private_subnet_tags = {
-    "kubernetes.io/cluster/eks_deploy" = "shared"
+    "kubernetes.io/cluster/eks_prod" = "shared"
+    "kubernetes.io/cluster/eks_staging" = "shared"
     "kubernetes.io/cluster/eks_dev" = "shared"
   }
 
   tags = {
-    "kubernetes.io/cluster/eks_deploy" = "shared"
+    "kubernetes.io/cluster/eks_prod" = "shared"
+    "kubernetes.io/cluster/eks_staging" = "shared"
     "kubernetes.io/cluster/eks_dev" = "shared"
   }
 }
@@ -108,11 +111,50 @@ module "eks_dev" {
 
 
 
-module "eks_deploy" {
+module "eks_prod" {
   source  = "terraform-aws-modules/eks/aws"
   version = "~> 20.31"
 
-  cluster_name    = "weather-app-deploy"
+  cluster_name    = "weather-app-prod"
+  cluster_version = "1.32"
+
+  subnet_ids = module.vpc.private_subnets
+  vpc_id     = module.vpc.vpc_id
+
+  enable_cluster_creator_admin_permissions = true
+  cluster_endpoint_public_access           = true
+
+
+
+  eks_managed_node_groups = {
+   
+    prod = {
+      desired_size = 2
+      min_size     = 1
+      max_size     = 2
+
+      instance_types = ["t3.micro"]
+
+      labels = {
+        environment = "prod"
+      }
+
+    }
+  }
+  tags = {
+    environment = "prod-eks-terraform"
+    Terraform   = "true"
+  }
+}
+
+
+
+
+module "eks_staging" {
+  source  = "terraform-aws-modules/eks/aws"
+  version = "~> 20.31"
+
+  cluster_name    = "weather-app-staging"
   cluster_version = "1.32"
 
   subnet_ids = module.vpc.private_subnets
@@ -137,21 +179,9 @@ module "eks_deploy" {
 
     }
 
-    prod = {
-      desired_size = 2
-      min_size     = 1
-      max_size     = 2
-
-      instance_types = ["t3.micro"]
-
-      labels = {
-        environment = "prod"
-      }
-
-    }
   }
   tags = {
-    environment = "deploy-eks-terraform"
+    environment = "staging-eks-terraform"
     Terraform   = "true"
   }
 }
