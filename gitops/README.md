@@ -147,7 +147,7 @@ This repo includes:
 
 Each environment has its own Argo CD `Application`, pointing to the same chart but with a different values file and destination cluster.
 
-Argo CD watches the repo and deploys the staging and production apps to their respective clusters
+Argo CD watches the repo and deploys the staging and production apps to their respective clusters \ 
 Argo CD tracks changes independently for each environment based on the chart and the specified values file
 
 ---
