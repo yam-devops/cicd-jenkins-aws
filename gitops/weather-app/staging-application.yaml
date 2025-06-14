@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: weather-app-staging
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://gitlab.com/your-org/weather-app-gitops
+    targetRevision: main
+    path: weather-app
+	helm:
+	  valueFiles:
+	   - staging-values.yaml
+  destination:
+    server: https://<STAGING-EKS-API-SERVER>   # <-- Replace with staging cluster API server URL or cluster name
+    namespace: staging
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+
