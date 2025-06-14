@@ -52,18 +52,51 @@ module "eks_dev" {
       min_capacity     = 1
 
       instance_types = ["t3.medium"]
+	  
+	  labels = {
+        role = "gitlab"
+	  }
     }
+
     jenkins = {
       desired_capacity = 1
       instance_types   = ["t3.medium"]
+
+	  labels = {
+        role = "jenkins"
+	  }
+
     }
+
+	jenkins_agent = {
+      desired_capacity = 1
+      instance_types   = ["t3.medium"]
+
+	  labels = {
+        role = "jenkins-agent"
+	  }
+
+    }
+
+
     monitoring = {
       desired_capacity = 1
       instance_types   = ["t3.medium"]
+
+	  labels = {
+        role = "monitoring"
+	  }
+
     }
+
     argocd = {
       desired_capacity = 1
       instance_types   = ["t3.medium"]
+
+	  labels = {
+        role = "argocd"
+	  }
+
     }
   }
   tags = {
