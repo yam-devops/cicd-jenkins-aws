@@ -21,4 +21,10 @@ spec:
           imagePullPolicy: {{ .Values.weatherApp.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.weatherApp.port }}
+          env:
+            - name: WEATHER_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.weatherApp.env.apiKeyName }}
+                  key: WEATHER_API_KEY
 

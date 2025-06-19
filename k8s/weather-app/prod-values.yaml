@@ -5,13 +5,13 @@ namespace: prod
 
 weatherApp:
   image:
-    repository: ${DOCKER_USER}/weather_app
+    repository: docker_user/weather_app
     tag: v17
     pullPolicy: IfNotPresent
     pullSecret: my-registry-secret
   port: 5000
-
-
+  env:
+    apiKeyName: weather-api-secret
 
 
 

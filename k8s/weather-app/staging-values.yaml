@@ -4,7 +4,7 @@ namespace: staging
 
 weatherApp:
   image:
-    repository: infinityam1/first_repo
+    repository: docker_user/weather_app
     tag: v17
     pullPolicy: IfNotPresent
     pullSecret: my-registry-secret
