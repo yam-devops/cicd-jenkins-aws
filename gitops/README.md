@@ -236,5 +236,5 @@ kubectl-argo-rollouts dashboard
 and access through localhost:3100
 
 
-P.S: when i first tried and used rollouts, i noticed the rollback function through the UI creates a new revision with the previous image version, so it does it through helm. Abort is useful as it just stops the current rollout and it does not create a new revision, so if the helm chart changed and not just an image version, abort will fix it.
+P.S: when i first tried and used rollouts, i noticed the rollback function through the UI creates a new revision with the previous image version, so it does it through helm. Abort is useful as it just stops the current rollout and uses the previous ReplicaSet without using helm, it does not create a new revision, so if the helm chart changed and not just an image version, abort will fix it.
 
