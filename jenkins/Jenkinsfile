@@ -7,7 +7,7 @@ pipeline {
     environment {
         VENV = 'venv'
         
-		GIT_USER_NAME = 'ci-bot'
+        GIT_USER_NAME = 'ci-bot'
         GIT_USER_EMAIL = 'ci@bot.com'
 
     }
@@ -30,55 +30,56 @@ pipeline {
         stage('Checkout') {
             steps {
                 
-				checkout scm
-				
-				script {
-						FAILED_STAGE = 'Checkout'
-						}
+                checkout scm
+                
+                script {
+                        FAILED_STAGE = 'Checkout'
+                        }
             }
         }
 
+        
         stage('Setup Python Environment') {
             steps {
-				script { FAILED_STAGE = 'Setup Python venv' }
+                script { FAILED_STAGE = 'Setup Python venv' }
                 sh '''
                     python3 -m venv $VENV
                     . $VENV/bin/activate
                     pip install --upgrade pip
                     pip install pylint
-					pip install -r src/requirements.txt
+                    pip install -r src/requirements.txt
                 '''
             }
         }
 
-        	stage('Static Analysis') {
-            	parallel {
-                	stage('Pylint') {
-                    	steps {
-							script { FAILED_STAGE = 'Pylint' }
-                        	sh '''
-                            	. $VENV/bin/activate
-                            	pylint src/ --fail-under=5
-                        	'''
-                    	}
-                	}
-		
+            stage('Static Analysis') {
+                parallel {
+                    stage('Pylint') {
+                        steps {
+                            script { FAILED_STAGE = 'Pylint' }
+                            sh '''
+                                . $VENV/bin/activate
+                                pylint src/ --fail-under=5
+                            '''
+                        }
+                    }
+        
 
-					stage('Run Trivy SCA Scan') {
-            			steps {
-							script { FAILED_STAGE = 'Trivy Scan' }
-                			sh '''
-								trivy fs --severity CRITICAL --exit-code 1 .
-                			'''
-            			}
-        			}
-				}
+                    stage('Run Trivy SCA Scan') {
+                        steps {
+                            script { FAILED_STAGE = 'Trivy Scan' }
+                            sh '''
+                                trivy fs --severity CRITICAL --exit-code 1 .
+                            '''
+                        }
+                    }
+                }
         
 
 
-	stage('Install Requirements') {
+    stage('Install Requirements') {
             steps {
-				script { FAILED_STAGE = 'Install Requirements' }
+                script { FAILED_STAGE = 'Install Requirements' }
                 sh '''
                     . $VENV/bin/activate
                     pip install -r src/requirements.txt
@@ -88,20 +89,20 @@ pipeline {
 
 
 
-	stage('Unit Tests') {
-			steps {
-					script { FAILED_STAGE = 'Unit Tests' }
-					sh '''
-						. $VENV/bin/activate
-						cd src/
-						pytest --ignore=tests/test_reachable.py --ignore=tests/test_selenium.py
-						'''
-			}
-		}
-
-	stage('Build App Image') {
+    stage('Unit Tests') {
             steps {
-					script { FAILED_STAGE = 'Build Image' }
+                    script { FAILED_STAGE = 'Unit Tests' }
+                    sh '''
+                        . $VENV/bin/activate
+                        cd src/
+                        pytest --ignore=tests/test_reachable.py --ignore=tests/test_selenium.py
+                        '''
+            }
+        }
+
+    stage('Build App Image') {
+            steps {
+                    script { FAILED_STAGE = 'Build Image' }
                     sh '''
                     docker build -t weather_app .
                     '''
@@ -111,7 +112,7 @@ pipeline {
 
     stage('Scan Docker Image with Trivy') {
             steps {
-				script { FAILED_STAGE = 'Secure scanning image' }
+                script { FAILED_STAGE = 'Secure scanning image' }
                 sh '''
                     trivy image --severity CRITICAL --exit-code 1 weather_app
                 '''
@@ -119,135 +120,135 @@ pipeline {
         }
     
 
-	stage('Run Container for Testing') {
-		    environment {
+    stage('Run Container for Testing') {
+            environment {
                 WEATHER_API_KEY = credentials('weather-api-key')
             }
-    		steps {
-				script { FAILED_STAGE = 'Running app container' }
-        		sh '''
-            		docker run -d -p 5000:5000 --name test-weather -e WEATHER_API_KEY=$WEATHER_API_KEY weather_app
-            		sleep 5
-        		'''
-    		}
-		}
+            steps {
+                script { FAILED_STAGE = 'Running app container' }
+                sh '''
+                    docker run -d -p 5000:5000 --name test-weather -e WEATHER_API_KEY=$WEATHER_API_KEY weather_app
+                    sleep 5
+                '''
+            }
+        }
 
 
-	stage('Run E2E Tests') {
-    		steps {
-				script { FAILED_STAGE = 'E2E testing on app container' }
-        		sh '''
-            		. $VENV/bin/activate
-            		pytest src/tests/test_selenium.py
-        		'''
-    		}
-		}
+    stage('Run E2E Tests') {
+            steps {
+                script { FAILED_STAGE = 'E2E testing on app container' }
+                sh '''
+                    . $VENV/bin/activate
+                    pytest src/tests/test_selenium.py
+                '''
+            }
+        }
 
 
-	stage('Stop and Remove Container') {
-    		steps {
-				script { FAILED_STAGE = 'Removing Container' }
-        		sh '''
-            		docker stop test-weather
-            		docker rm test-weather
-        		'''
-    		}
-		}
+    stage('Stop and Remove Container') {
+            steps {
+                script { FAILED_STAGE = 'Removing Container' }
+                sh '''
+                    docker stop test-weather
+                    docker rm test-weather
+                '''
+            }
+        }
 
 
-	stage('Push to Docker Hub') {
-    		steps {
-				script { FAILED_STAGE = 'Pushing image' }
-        		withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-            		sh '''
-                		echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                		docker tag weather_app $DOCKER_USER/weather_app:${IMAGE_TAG}
-                		docker push $DOCKER_USER/weather_app:${IMAGE_TAG}
-            		'''
-        		}
-    		}
-		}
+    stage('Push to Docker Hub') {
+            steps {
+                script { FAILED_STAGE = 'Pushing image' }
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh '''
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        docker tag weather_app $DOCKER_USER/weather_app:${IMAGE_TAG}
+                        docker push $DOCKER_USER/weather_app:${IMAGE_TAG}
+                    '''
+                }
+            }
+        }
 
     stage('Tag Push to Production') {
-    	when {
-        	branch 'prod'
-    	}
-    		steps {
-				script { FAILED_STAGE = 'Tagging prod push in git' }
-        		sh '''
-            		git config user.name "$GIT_USER_NAME"
-            		git config user.email "$GIT_USER_EMAIL"
-            		git tag -a "pushed-image-${IMAGE_TAG}" -m "Pushed to repo to prod"
-            		git push origin --tags
-        		'''
-    		}
-		}
+        when {
+            branch 'prod'
+        }
+            steps {
+                script { FAILED_STAGE = 'Tagging prod push in git' }
+                sh '''
+                    git config user.name "$GIT_USER_NAME"
+                    git config user.email "$GIT_USER_EMAIL"
+                    git tag -a "pushed-image-${IMAGE_TAG}" -m "Pushed to repo to prod"
+                    git push origin --tags
+                '''
+            }
+        }
 
 
 
-	stage('Update GitOps Repo') {
-    		steps {
-				script { FAILED_STAGE = 'Updating gitops version' }
-        		withCredentials([usernamePassword(credentialsId: 'gitops-creds', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')]) {
-				sh """
-            		git config user.name "$GIT_USER_NAME"
-            		git config user.email "$GIT_USER_EMAIL"
+    stage('Update GitOps Repo') {
+            steps {
+                script { FAILED_STAGE = 'Updating gitops version' }
+                withCredentials([usernamePassword(credentialsId: 'gitops-creds', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')]) {
+                sh """
+                    git config user.name "$GIT_USER_NAME"
+                    git config user.email "$GIT_USER_EMAIL"
 
                     git clone https://$GIT_USER:$GIT_TOKEN@github.com/gitops/gitops-repo.git gitops-repo		
-            		cd gitops-repo
+                    cd gitops-repo
 
 
-         			if [ "$BRANCH_NAME" = "prod" ]; then	
-						ENVIRONMENT="prod"
-            		
-					elif [ "$BRANCH_NAME" = "staging" ]; then
-                		ENVIRONMENT="staging"
-            		
-					fi
+                     if [ "$BRANCH_NAME" = "prod" ]; then	
+                        ENVIRONMENT="prod"
+                    
+                    elif [ "$BRANCH_NAME" = "staging" ]; then
+                        ENVIRONMENT="staging"
+                    
+                    fi
 
-					yq -i '.weatherApp.image.tag = "${IMAGE_TAG}"' charts/weather-app/${ENVIRONMENT}-values.yaml
+                    yq -i '.weatherApp.image.tag = "${IMAGE_TAG}"' charts/weather-app/${ENVIRONMENT}-values.yaml
 
-            		git add charts/weather-app/${ENVIRONMENT}-values.yaml
-            		git commit -m "Update image tag to ${IMAGE_TAG} for ${ENVIRONMENT}"
-            		git push origin main
-        		"""
-    			}
-			}
-		}
-
-
-
+                    git add charts/weather-app/${ENVIRONMENT}-values.yaml
+                    git commit -m "Update image tag to ${IMAGE_TAG} for ${ENVIRONMENT}"
+                    git push origin main
+                """
+                }
+            }
+        }
 
 
 
 
 
 
-	}
+
+
+
+    }
 
     post {
-	
-	success {
-    		script {
+    
+    success {
+            script {
                 slackSend channel: '#success-build-notifications', message: """
-				✅ GOAAALLLLLL: Jenkins Build #${env.BUILD_NUMBER} passed!
-				Author: ${env.AUTHOR}
-				Commit: ${env.GIT_COMMIT}
-				Image: ${env.IMAGE_TAG}
-				"""
+                ✅ GOAAALLLLLL: Jenkins Build #${env.BUILD_NUMBER} passed!
+                Author: ${env.AUTHOR}
+                Commit: ${env.GIT_COMMIT}
+                Image: ${env.IMAGE_TAG}
+                """
 
             }
         }
     
 
-	failure {
+    failure {
             script {
                 slackSend channel: '#failed-build-alerts', message: """
-				❌ FAILURE: Jenkins Build #${env.BUILD_NUMBER} failed!"
-				Author: ${env.AUTHOR}
+                ❌ FAILURE: Jenkins Build #${env.BUILD_NUMBER} failed!"
+                Author: ${env.AUTHOR}
                 Commit: ${env.GIT_COMMIT}
-				Stage failed: ${FAILED_STAGE ?: "unknown"}
-				"""
+                Stage failed: ${FAILED_STAGE ?: "unknown"}
+                """
             }
         }
 
