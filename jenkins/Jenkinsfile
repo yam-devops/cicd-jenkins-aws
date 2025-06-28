@@ -6,10 +6,6 @@ pipeline {
 
     environment {
         VENV = 'venv'
-		#SHORT_COMMIT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
-    	#AUTHOR = sh(script: "git --no-pager show -s --format='%an' ${env.GIT_COMMIT}", returnStdout: true).trim()
-
-		#IMAGE_TAG = "${env.BUILD_NUMBER}-${SHORT_COMMIT}-${env.BRANCH_NAME}"
         
 		GIT_USER_NAME = 'ci-bot'
         GIT_USER_EMAIL = 'ci@bot.com'
@@ -17,6 +13,20 @@ pipeline {
     }
 
     stages {
+      stage('Prepare') {
+         steps {
+           script {
+                def shortCommit = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+                def author = sh(script: "git --no-pager show -s --format='%an' ${env.GIT_COMMIT}", returnStdout: true).trim()
+                def imageTag = "${env.BUILD_NUMBER}-${shortCommit}-${env.BRANCH_NAME}"
+
+                env.SHORT_COMMIT = shortCommit
+                env.AUTHOR = author
+                env.IMAGE_TAG = imageTag
+                }
+          }
+       }
+
         stage('Checkout') {
             steps {
                 
@@ -24,9 +34,6 @@ pipeline {
 				
 				script {
 						FAILED_STAGE = 'Checkout'
-						env.SHORT_COMMIT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
-        				env.AUTHOR = sh(script: "git --no-pager show -s --format='%an' ${env.GIT_COMMIT}", returnStdout: true).trim()
-						env.IMAGE_TAG = "${env.BUILD_NUMBER}-${SHORT_COMMIT}-${env.BRANCH_NAME}"
 						}
             }
         }
@@ -113,10 +120,13 @@ pipeline {
     
 
 	stage('Run Container for Testing') {
+		    environment {
+                WEATHER_API_KEY = credentials('weather-api-key')
+            }
     		steps {
 				script { FAILED_STAGE = 'Running app container' }
         		sh '''
-            		docker run -d -p 5000:5000 --name test-weather weather-app
+            		docker run -d -p 5000:5000 --name test-weather -e WEATHER_API_KEY=$WEATHER_API_KEY weather_app
             		sleep 5
         		'''
     		}
