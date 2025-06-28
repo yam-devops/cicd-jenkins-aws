@@ -93,18 +93,27 @@ But the most important thing i considered for choosing Jenkins is because of how
 
 **Notify pipeline success/fail**: Sending a message to a slack channel if the pipeline succeeded or failed with the developer name, commit & build number, and failed stage if it failed
 
-**Argo CD Takes control**: Argo CD reconciles every 3 minutes to compare desired state in the Git repo and the current state in the cluster and sync's the new version - and sends notification if sync was successful/failed
+**Argo CD Takes control**: Argo CD reconciles every 3 minutes to compare desired state in the Git repo and the current state in the cluster and sync's the new version, deploys via Argo Rollouts, enabling canary strategy - and sends notification if sync was successful/failed
 
 
 ---
 
+## Argo Rollout Canary Deployment
+I added a dedicated directory containing the Argo Rollout for a canary deployment strategy that allows more control and deeper intervention (like using metrics throughout the deployment).
 
+## Benefits of Argo Rollouts
+
+- Progressive Delivery: Shift traffic in controlled increments instead of all at once.
+- Automatic Rollback: Failures detected via health checks or metrics trigger immediate rollback.
+- Allow human/metric-based promotion or rollback.
+- Manual Control: Ability to pause, resume, or promote rollouts.
+- Traffic Routing: Supports service mesh and ingress-based routing (e.g., AWS ALB).
+
+[GitOps and ArgoCD documentation](gitops/)
 
 ## Future Improvements
 
  - Add secret management
-
- - Documenting Argo rollouts for rolling out in a canary deployment strategy and roll back a failed deployment
 
  - Add monitoring (Prometheus + Grafana) (I have implemented it in another project, i want to make it on this project, working on making it possible on tracking 3 clusters)
 
