@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://gitlab.com/your-org/weather-app-gitops
+    repoURL: https://gitlab.com/weather-registry/weather-app-gitops
     targetRevision: main
     path: weather-app
 	helm:
