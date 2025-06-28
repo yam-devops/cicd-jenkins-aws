@@ -91,7 +91,7 @@ But the most important thing i considered for choosing Jenkins is because of how
 
 **Update Argo CD helm values**: Updating the {environment}-values.yaml in the helm chart Argo CD follow's with the new image version.
 
-**Notify pipeline success/fail**: Sending a message to a slack channel if the pipeline successed or failed with the developer name, commit & build number, and failed stage if it failed
+**Notify pipeline success/fail**: Sending a message to a slack channel if the pipeline succeeded or failed with the developer name, commit & build number, and failed stage if it failed
 
 **Argo CD Takes control**: Argo CD reconciles every 3 minutes to compare desired state in the Git repo and the current state in the cluster and sync's the new version - and sends notification if sync was successful/failed
 
