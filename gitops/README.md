@@ -16,7 +16,7 @@ All desired state for the weather app — including Kubernetes manifests, Helm c
 
 - **Version control**: every change is tracked.
 - **Auditability**: I know exactly what was deployed and when.
-- **Rollbacks**: I can revert to a previous state with a simple Git revert, Or using Argo rollout which i will add to this repo soon.
+- **Rollbacks**: I can revert to a previous state with a simple Git revert, Or using Argo rollouts.
 ---
 
 ## Architecture Summary
@@ -162,4 +162,79 @@ This setup provides a full GitOps workflow with:
 - A clean migration from GitLab.com to **self-hosted GitLab** as the source of truth
 
 It allows me to scale deployments, track changes via Git, and have a fully automated and declarative CI/CD pipeline across environments.
+
+
+
+---
+
+## Argo Rollouts
+
+There is also an option to deploy the application using Argo rollouts for different deployment strategies,
+The advantages and usage discussed in the main README 
+
+
+- install Argo Rollouts controller
+
+```bash
+kubectl create namespace argo-rollouts
+helm repo add argo https://argoproj.github.io/argo-helm
+helm repo update
+helm install argo-rollouts argo/argo-rollouts   -n argo-rollouts   --set installCRDs=true
+```
+
+- install Argo Rollouts CLI
+
+```bash
+ curl -sLO https://github.com/argoproj/argo-rollouts/releases/latest/download/kubectl-argo-rollouts-linux-amd64
+chmod +x kubectl-argo-rollouts-linux-amd64
+sudo mv kubectl-argo-rollouts-linux-amd64 /usr/local/bin/kubectl-argo-rollouts
+```
+
+then you can use commands to inspect rollouts
+
+```bash
+kubectl-argo-rollouts get rollout weather-app
+kubectl-argo-rollouts abort weather-app
+```
+
+you can see something like this when a rollout fails
+```bash
+
+kubectl-argo-rollouts get rollout weather-app
+Name:            weather-app
+Namespace:       default
+Status:          ◌ Progressing
+Message:         more replicas need to be updated
+Strategy:        Canary
+  Step:          0/3
+  SetWeight:     50
+  ActualWeight:  0
+Images:          nginx:1.21 (canary, stable)
+Replicas:
+  Desired:       2
+  Current:       3
+  Updated:       1
+  Ready:         2
+  Available:     2
+
+NAME                                     KIND        STATUS         AGE    INFO
+⟳ weather-app                            Rollout     ◌ Progressing  6m40s
+├──# revision:2
+│  └──⧉ weather-app-5679855949           ReplicaSet  ◌ Progressing  54s    canary
+│     └──□ weather-app-5679855949-xwqgl  Pod         ✔ Running      54s    ready:0/1
+└──# revision:1
+   └──⧉ weather-app-785c7bbcd7           ReplicaSet  ✔ Healthy      6m40s  stable
+      ├──□ weather-app-785c7bbcd7-2vjzv  Pod         ✔ Running      6m40s  ready:1/1
+      └──□ weather-app-785c7bbcd7-rnmhd  Pod         ✔ Running      6m40s  ready:1/1
+
+```
+
+- To use a UI for the rollouts you can
+```bash
+kubectl-argo-rollouts dashboard
+```
+and access through localhost:3100
+
+
+P.S: when i first tried and used rollouts, i noticed the rollback function through the UI creates a new revision with the previous image version, so it does it through helm. Abort is useful as it just stops the current rollout and it does not create a new revision, so if the helm chart changed and not just an image version, abort will fix it.
 
