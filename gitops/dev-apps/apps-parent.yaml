@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/your-org/gitops-infra
+    repoURL: https://gitlab.com/weather-infra/gitops-infra
     targetRevision: main
     path: dev-apps         # <--- Directory containing the other app manifests
   destination:
